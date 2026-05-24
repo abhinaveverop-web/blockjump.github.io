@@ -68,7 +68,7 @@ kaplay({
 });
 scene("start", () => {
   add([text("Press space/tap to start")]);
-  onButtonPress("space", () => {
+  onKeyPress("space", () => {
     go("game");
   });
 });
