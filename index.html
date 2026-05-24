@@ -32,6 +32,12 @@
 kaplay({
   background: [0, 255, 255]
 });
+scene("start", () => {
+  add([text("Press space/tap to start")]);
+  onButtonPress("space", () => {
+    go("game");
+  });
+});
 scene("game", () => {
   setGravity(2200);
   let score = 0;
@@ -70,7 +76,7 @@ scene("game", () => {
   onKeyDown("space", () => {
     bird.jump(350);
   });
-  onTouchDown("space", () => {
+  onClick("space", () => {
     bird.jump(350);
   });
   bird.onCollide("pillar", () => {
@@ -147,7 +153,7 @@ scene("lose", () => {
   onKeyPress("space", () => {
     go("game");
   });
-  onTouchDown("space", () => {
+  onClick("space", () => {
     go("game");
   });
 });
