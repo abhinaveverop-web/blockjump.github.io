@@ -1,0 +1,164 @@
+kaplay({
+    background: [0, 255, 255],
+})
+
+scene("game", () => {
+
+    setGravity(2200)
+
+    let score = 0
+    let r1 = rand(0, 255)
+    let r2 = rand(0, 255)
+    let r3 = rand(0, 255)
+
+
+    const scoreLabel = add([
+        text("Score " + score),
+        pos(20, 20),
+    ])
+
+    // BIRD
+    const bird = add([
+        rect(15, 20),
+        color(YELLOW),
+        outline(4),
+        pos(90, 100),
+        body(),
+        area(),
+        "bird",
+    ])
+
+    // FLOOR
+    add([
+        rect(width(), 40),
+        pos(0, height() - 40),
+        area(),
+        body({ isStatic: true }),
+        color(GREEN),
+        "floor",
+    ])
+    // ROOF
+    add([
+        rect(width(), 4),
+        pos(0, 0),
+        area(),
+        body({ isStatic: true }),
+        color(0, 255, 255),
+        "roof",
+    ])
+    // JUMP
+    onKeyDown("space", () => {
+        bird.jump(350)
+    })
+    onTouchDown("space", () => {
+        bird.jump(350)
+    }) 
+
+    // COLLISION WITH PILLAR
+    bird.onCollide("pillar", () => {
+        addKaboom(bird.pos)
+
+        wait(0.3, () => {
+            go("lose")
+        })
+    })
+
+    // COLLISION WITH FLOOR
+    bird.onCollide("floor", () => {
+        addKaboom(bird.pos)
+
+        wait(0.3, () => {
+            go("lose")
+        })
+    })
+    // COLLISION WITH FLOOR
+    bird.onCollide("roof", () => {
+        addKaboom(bird.pos)
+
+        wait(0.3, () => {
+            go("lose")
+        })
+    })
+    // SPAWN PILLARS
+    function spawnPillars() {
+        let r1 = rand(0, 255)
+        let r2 = rand(0, 255)
+        let r3 = rand(0, 255)
+        const gap = 170
+        const pillarHeight = rand(0, 250)
+
+        // BOTTOM
+        const bottom = add([
+            rect(40, pillarHeight),
+            pos(width(), height() - pillarHeight),
+            area(),
+            body({ isStatic: true }),
+            color(r1, r2, r3),
+            outline(3),
+            "pillar",
+        ])
+
+        // TOP
+        const topHeight = height() - pillarHeight - gap
+
+        const top = add([
+            rect(40, topHeight),
+            pos(width(), 0),
+            area(),
+            body({ isStatic: true }),
+            color(r1, r2, r3),
+            outline(3),
+            "pillar",
+        ])
+
+        // MOVE BOTTOM
+        bottom.onUpdate(() => {
+
+            bottom.move(-200, 0)
+
+            if (bottom.pos.x < -50) {
+                destroy(bottom)
+
+                score++
+                scoreLabel.text = "Score " + score
+            }
+        })
+
+        // MOVE TOP
+        top.onUpdate(() => {
+
+            top.move(-200, 0)
+
+            if (top.pos.x < -50) {
+                destroy(top)
+            }
+        })
+    }
+
+    // LOOP
+    loop(1.5, () => {
+        spawnPillars()
+    })
+})
+
+scene("lose", () => {
+
+    add([
+        text("Game Over"),
+        pos(100, 100),
+    ])
+
+    add([
+        text("Press Space/Click To Try Again"),
+        pos(100, 140),
+    ])
+
+    onKeyPress("space", () => {
+        go("game")
+    })
+    onTouchDown("space", () => {
+        go("game")
+    })
+})
+
+go("game")
